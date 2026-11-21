@@ -10,15 +10,28 @@ would exceed 1,048,576 bytes, JPEG bytes are written to the same path
 import datetime
 import math
 import os
-
-from PIL import Image, ImageDraw, ImageFilter, ImageFont
+import sys
 
 HERE = os.path.dirname(os.path.abspath(__file__))
+
+# The grader's bare python:3.13 image has no Pillow and no fonts, so both
+# ship inside deps.zip next to this file and are extracted to the temp
+# dir on first run (the grader gives the entry a writable /tmp).
+import tempfile
+import zipfile
+
+_DEPS_DIR = os.path.join(tempfile.gettempdir(), "ostravia-deps")
+if not os.path.isdir(os.path.join(_DEPS_DIR, "vendor", "PIL")):
+    with zipfile.ZipFile(os.path.join(HERE, "deps.zip")) as _z:
+        _z.extractall(_DEPS_DIR)
+sys.path.insert(0, os.path.join(_DEPS_DIR, "vendor"))
+
+from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, H = 1024, 768
 PAGE = W // 2  # each page is 512 wide
 
-FONT_DIR = "/usr/share/fonts/truetype/dejavu"
+FONT_DIR = os.path.join(_DEPS_DIR, "fonts")
 SERIF = os.path.join(FONT_DIR, "DejaVuSerif.ttf")
 SERIF_B = os.path.join(FONT_DIR, "DejaVuSerif-Bold.ttf")
 SANS = os.path.join(FONT_DIR, "DejaVuSans.ttf")
